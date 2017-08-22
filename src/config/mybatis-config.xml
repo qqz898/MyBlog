@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">  
+<configuration>
+  
+ <typeAliases>
+	<typeAlias alias="User" type="blog.ssm.domain.User"/>
+	<typeAlias alias="Blog" type="blog.ssm.domain.Blog"/>
+	<typeAlias alias="Comment" type="blog.ssm.domain.Comment"/>
+	<typeAlias alias="Album" type="blog.ssm.domain.Album"/>
+	<typeAlias alias="Photo" type="blog.ssm.domain.Photo"/>
+	<typeAlias alias="ArtCat" type="blog.ssm.domain.ArtCat"/>
+	</typeAliases>
+	
+</configuration>

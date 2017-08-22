@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper  
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"  
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+  
+<mapper namespace="blog.ssm.mapper.BlogMapper">  
+    <resultMap type="Blog" id="BlogResultMap">  
+        <id column="blog_id" property="blog_id"/> 
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="time" property="time"/>
+        <result column="access_authority" property="access_authority"/> 
+        <result column="artcat" property="artcat"/>
+        <association property="user" javaType="User">  
+            <id column="user_id" property="user_id"/>  
+            <result column="name" property="name"/>  
+            <result column="password" property="password"/>
+        </association>
+        <!-- 
+        <collection property="comment" ofType="Comment" column="comment_blog_id">
+			<id property="comment_id" column="comment_id"/>    
+            <result property="from_user_id" column="from_user_id"/>
+            <result property="to_user_id" column="to_user_id"/> 
+            <result property="comment_type" column="comment_type"/> 
+            <result property="comment_blog_id" column="comment_blog_id"/> 
+            <result property="comment_context" column="comment_context"/> 
+		</collection>  
+		 -->
+    </resultMap>  
+     
+    <!-- 通过博主ID查找博客 --> 
+    <select id="selectBlogByUserID" parameterType="int" resultMap="BlogResultMap">  
+        select user.*,blog.* from blog_user user,blog_blog blog where blog.ownerID=user.user_id and user.user_id=#{id}  
+    </select> 
+    
+    
+    <!-- 通过博主ID和博客分类查找博客 --> 
+    <select id="selectBlogByUserIDAndCat" parameterType="int" resultMap="BlogResultMap">  
+        select user.*,blog.* from blog_user user,blog_blog blog where blog.ownerID=user.user_id and user.user_id=#{0} and blog.artcat=#{1}  
+    </select>
+    
+    <!-- 以游客身份通过博主ID和博客分类查找博客 --> 
+    <select id="selectBlogByUserIDAndCatasVisitor" parameterType="int" resultMap="BlogResultMap">  
+        select user.*,blog.* from blog_user user,blog_blog blog where blog.ownerID=user.user_id and user.user_id=#{0} and blog.artcat=#{1} and blog.access_authority=1  
+    </select>
+    
+    <!-- 通过博主ID以游客身份查找ID，不包含私密博客 -->
+    <select id="selectBlogByUserIDasVisitor" parameterType="int" resultMap="BlogResultMap">  
+        select user.*,blog.* from blog_user user,blog_blog blog where blog.ownerID=user.user_id and user.user_id=#{id} and blog.access_authority=1   
+    </select> 
+    
+    <!-- 显示日志列表用，分页查询 -->
+	  <select id="getUserArticleByPage" resultMap="BlogResultMap">
+	  	select user.*,blog.* from blog_user user,blog_blog blog where blog.ownerID=user.user_id and user.user_id=#{0} order by blog.blog_id desc limit #{1},#{2}
+	  </select>
+	  
+	<!-- 显示日志列表用，根据所选博客分类分页查询 -->
+	  <select id="selectBlogByPageAndCatId" resultMap="BlogResultMap">
+	  	select user.*,blog.* from blog_user user,blog_blog blog where blog.ownerID=user.user_id and user.user_id=#{0} and blog.artcat=#{3} order by blog.blog_id desc limit #{1},#{2}
+	  </select>
+	  
+	  <!-- 以游客身份，显示日志列表用，根据所选博客分类分页查询 -->
+	  <select id="selectBlogByPageAndCatIdasVisitor" resultMap="BlogResultMap">
+	  	select user.*,blog.* from blog_user user,blog_blog blog where blog.ownerID=user.user_id and user.user_id=#{0} and blog.access_authority=1 and blog.artcat=#{3} order by blog.blog_id desc limit #{1},#{2}
+	  </select>
+	  
+	  <!-- 通过博主ID以游客身份查找ID，不包含私密博客 -->
+    <select id="getFiveBlogs" parameterType="int" resultMap="BlogResultMap">  
+        select * from blog_blog where ownerID=#{id} and access_authority=1 order by blog_id desc limit 5
+        
+    </select> 
+	  
+	 
+	  <!-- 显示日志列表用，分页查询,以游客身份 -->
+	  <select id="getUserArticleByPageasVisitor" resultMap="BlogResultMap">
+	  	select user.*,blog.* from blog_user user,blog_blog blog where blog.ownerID=user.user_id and blog.access_authority=1 and user.user_id=#{0} order by blog.blog_id desc limit #{1},#{2}
+	  </select>
+    
+    <!-- 根据ID删除文章 -->
+    <delete id="deleteBlogByArticleID" parameterType="int">
+	  delete from blog_blog where blog_id = #{id}
+	</delete>
+	
+    <!-- 根据博客ID查询博客-->
+	  <select id="selectBlogByBlogId" resultMap="BlogResultMap">
+	  	select user.*,blog.* from blog_user user,blog_blog blog where blog.ownerID=user.user_id and blog.blog_id=#{0}
+	  </select>
+	  
+	  <!-- 根据博客ID查询评论-->
+	  <select id="selectCommentByBlogId" resultType="Comment" parameterType="int">
+	  	select * from blog_comment where comment_blog_id = #{id}
+	  </select>
+	  
+	<!-- 根据博客ID修改博客 -->
+	<update id="modifyBlogById" parameterType="User">
+	  update blog_blog set title = #{1},content = #{2},time = #{3},access_authority = #{4},artcat = #{5} where blog_id = #{0}
+	</update>
+	  
+	<!-- 提交博客中的评论 -->
+	<insert id="submitBlogComment" parameterType="Comment">
+ 	 insert into blog_comment (from_user_id,to_user_id,comment_type,comment_blog_id,comment_context,time) values (#{from_user_id},#{to_user_id},#{comment_type},#{comment_blog_id},#{comment_context},#{time})
+	</insert> 
+	
+	<!-- 根据ID删除留言 -->
+    <delete id="deleteMessageByMessageID" parameterType="int">
+	  delete from blog_comment where comment_id = #{id}
+	</delete>
+    
+    <insert id="submitBlog" parameterType="Blog">
+ 	 insert into blog_blog (ownerID,title,content,time,access_authority,artcat) values (#{user.user_id},#{title},#{content},#{time},#{access_authority},#{artcat})
+	</insert> 
+  
+</mapper>  

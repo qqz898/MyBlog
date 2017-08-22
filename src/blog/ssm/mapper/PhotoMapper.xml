@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="blog.ssm.mapper.PhotoMapper">
+<resultMap type="Photo" id="ResultPhotoMap">  
+        <id column="photo_id" property="photo_id"/> 
+        <result column="photo_url" property="photo_url"/>
+        <result column="photo_album" property="photo_album"/>  
+        <!-- 
+        <association property="album" javaType="User">  
+            <id column="user_id" property="user_id"/>  
+            <result column="name" property="name"/>  
+            <result column="password" property="password"/>
+        </association>
+    	 -->
+</resultMap> 
+
+<!--根据相册id取出其中的所有照片 -->
+<select id="getPhotosByAlbumId" parameterType="int" resultMap="ResultPhotoMap" >
+	select * from blog_photo where photo_album = #{id} 
+</select>
+
+<!--根据照片id取出照片 -->
+<select id="selectPhotoByPhotoId" parameterType="int" resultType="Photo">
+	select * from blog_photo where photo_id = #{id}
+</select>
+
+<!-- 根据ID删除照片 -->
+<delete id="deletePhotoByPhotoId" parameterType="int">
+  delete from blog_photo where photo_id = #{id}
+</delete>
+
+<!-- 用户上传新照片,将url写入数据库 -->
+<insert id="addPhotoToDb" parameterType="Photo">
+ 	 insert into blog_photo (photo_url,photo_album,photo_oldname,photo_storename) values (#{photo_url},#{photo_album},#{photo_oldname},#{photo_storename})
+</insert> 
+
+</mapper>

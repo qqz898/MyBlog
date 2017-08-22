@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+		xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx"
+		xsi:schemaLocation="
+			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
+			http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-2.5.xsd
+			http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-2.5.xsd">
+
+  <!-- 自动扫描包中的bean -->
+	<context:component-scan base-package="blog.ssm.*" />
+  <!-- 配置数据源 -->
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+		<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+		<property name="url" value="jdbc:mysql://sqld.duapp.com:4050/qJpHfMLzyVTCCuPkmxpO?useUnicode=true&amp;characterEncoding=utf-8&amp;autoReconnect=true&amp;failOverReadOnly=false"/>
+		<property name="username" value="cf3eee90f10244e697dd40d78ed195f5"/>
+		<property name="password" value="57479f3f95364c679106aebf8402ce2e"/>
+		<property name="validationQuery" value="SELECT 1" />
+    	<property name="testOnBorrow" value="true"/>
+		<!-- 连接池启动时的初始值，初始创建了几个数据库连接以备使用 -->
+		<property name="initialSize" value="3"/>
+		<!-- 连接池的最大值，当需要更多连接时的保护机制，设置了可创建的连接上限 -->
+		<property name="maxActive" value="500"/>
+	 	<!-- 最大空闲值.当经过一个高峰时间后，连接池可以慢慢将已经用不到的连接慢慢释放一部分，一直减少到maxIdle为止 -->
+		<property name="maxIdle" value="2"/>
+		<!--  最小空闲值.当空闲的连接数少于阀值时，连接池就会预申请去一些连接，以免洪峰来时来不及申请 -->
+		<property name="minIdle" value="1"/>
+	</bean>
+	<!-- 配置sqlSessionFactory -->
+	<!-- spring和MyBatis完美整合，不需要mybatis的配置映射文件 -->  
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">  
+        <property name="dataSource" ref="dataSource" />  
+        <!-- 自动扫描mapping.xml文件 -->  
+        <property name="configLocation" value="classpath:config/mybatis-config.xml"></property> 
+        <!--  
+        <property name="mapperLocations" value="classpath:blog/ssm/mapper/*.xml"></property>
+         -->
+    </bean>  
+    <!-- 配置扫描包，加载mapper代理对象 -->
+    <!-- DAO接口所在包名，Spring会自动查找其下的类
+    扫描mapper后，则不必再mybatis的配置文件（sqlMapConfig.xml）中进行扫描。
+    且该扫描为每个mapper接口生成了代理对象，注入了sqlSessionFactory对象。 -->  
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">  
+        <property name="basePackage" value="blog.ssm.mapper" />  
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>  
+    </bean>  
+    
+    <!-- (事务管理)transaction manager, use JtaTransactionManager for global tx -->  
+    <bean id="transactionManager"  
+        class="org.springframework.jdbc.datasource.DataSourceTransactionManager">  
+        <property name="dataSource" ref="dataSource" />  
+    </bean>  
+    
+    
+    <!-- 定义文件上传解析器 -->
+	<bean id="multipartResolver"
+		class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<!-- 设定默认编码 -->
+		<property name="defaultEncoding" value="UTF-8"></property>
+		<!-- 设定文件上传的最大值100MB，10*1024*1024 -->
+		<property name="maxUploadSize" value="1048576000"></property>
+	</bean>
+</beans>

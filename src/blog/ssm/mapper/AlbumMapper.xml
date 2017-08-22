@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="blog.ssm.mapper.AlbumMapper">
+
+<resultMap type="Album" id="resultAlbumMap">
+		<id column="album_id" property="album_id"/>
+		<result property="album_owner" column="album_owner" />
+		<result property="album_intro" column="album_intro" />
+		<result property="album_authority" column="album_authority" />
+		<result property="album_name" column="album_name" />
+		<!-- 
+		<collection property="photo" ofType="Photo">
+			<id property="photo_id" column="photo_id"/>    
+            <result property="photo_url" column="photo_url"/>
+            <result property="photo_album" column="photo_album"/> 
+		</collection>
+		 -->
+</resultMap>
+
+<!-- 一对多，根据用户id取出album -->
+<select id="getAlbumByOwnerId" parameterType="int" resultMap="resultAlbumMap" >
+	select album.* from blog_album album where album.album_owner=#{id} 
+</select>
+
+<!-- 一对多，根据用户id取出album -->
+<select id="getAllOpenAlbumByOwnerId" parameterType="int" resultMap="resultAlbumMap" >
+	select album.* from blog_album album where album.album_owner=#{id} and album.album_authority=0 
+</select>
+
+<!-- 建立相册，将相册信息写入数据库 -->
+<insert id="BuildAlbum" parameterType="Album" useGeneratedKeys="true" keyProperty="id">
+  insert into blog_album(album_name,album_owner,album_intro,album_authority) values (#{album_name},#{album_owner},#{album_intro},#{album_authority})
+</insert>
+
+<!-- 用户上传照片时，将照片url写入album的封面url字段 -->
+<update id="SetFrontCover">
+  update blog_album set album_frontcover = #{1} where album_id = #{0}
+</update>
+
+<!-- 根据相册id查找相册 -->
+<select id="selectAlbumByAlbumId" parameterType="int" resultMap="resultAlbumMap" >
+	select * from blog_album where album_id=#{id} 
+</select>
+
+<!-- 根据相册ID删除相册 -->
+<delete id="deleteAlbumByAlbumId" parameterType="int">
+  delete from blog_album where album_id = #{id}
+</delete>
+
+<!-- 通过博主ID以游客身份查找相册，不包含私密相册,取3个,主页展示用 -->
+ <select id="getLastThreeAlbum" parameterType="int" resultMap="resultAlbumMap">  
+     select * from blog_album where album_owner=#{id} and album_authority=0 order by album_id desc limit 3
+     
+ </select> 
+
+</mapper>

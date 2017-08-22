@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="blog.ssm.mapper.UserMapper">
+  
+  <resultMap type="User" id="resultUserMap">
+		<result property="user_id" column="user_id" />
+		<result property="name" column="name" />
+		<result property="password" column="password" />
+		<result property="introduction" column="introduction" />
+		<result property="nickname" column="nickname" />
+		<result property="email" column="email" />
+		<result property="icon" column="icon" />
+		<collection property="blog" ofType="Blog" column="ownerID">
+			<id property="blog_id" column="blog_id"/>    
+            <result property="title" column="title"/>
+            <result property="content" column="content"/> 
+		</collection>
+	</resultMap>
+  <!-- 一对多，从文章id取出user信息 -->
+  <select id="selectUserByBlogID" parameterType="int" resultMap="resultUserMap" >
+		select user.*,blog.* from blog_user user,blog_blog blog where user.user_id=blog.ownerID and user.user_id=#{id} 
+  </select>
+  
+  <!-- 通过ID查找用户 -->
+  <select id="selectUserById" resultType="User">
+    select * from blog_user where user_id = #{id}
+  </select>
+  
+  <!-- 通过名字查找用户 -->
+  <select id="selectUserByName" resultType="User">
+    select * from blog_user where name = #{name}
+  </select>
+  
+  <!-- 取出所有用户 -->
+  <select id="selectAllUsers" resultMap="resultUserMap">
+    select * from blog_user
+  </select>
+  <!-- 登录验证用，根据用户名和密码查找用户 -->
+  <select id="getUserByNameAndPwd" resultType="User">
+    select * from blog_user where name = #{0} and password = #{1}
+  </select>
+  
+  <!-- 根据用户ID查找该用户留言版上的留言 -->
+  <select id="selectMessageBoardByUserId" parameterType="int" resultType="Comment">
+    select * from blog_comment where to_user_id = #{id} and comment_type=2
+  </select>
+  
+  <!-- 修改用户密码 -->
+  <update id="modifyPassword">
+  update blog_user set password = #{1} where user_id = #{0}
+</update>
+
+<!-- 更新用户头像 -->
+  <update id="setUserIcon">
+  update blog_user set icon = #{1} where user_id = #{0}
+</update>
+
+
+<!-- 修改用户个人信息 -->
+  <update id="modifyPersonalInfo" parameterType="User">
+  update blog_user set nickname = #{nickname},email = #{email},introduction = #{introduction} where user_id = #{user_id}
+</update>
+  
+  <insert id="doSignupProcess" parameterType="User" useGeneratedKeys="true" keyProperty="id">
+  insert into blog_user (name,password,email) values (#{name},#{password},#{email})
+</insert>
+
+<update id="updateUser" parameterType="User">
+  update blog_user set password = #{password} where name = #{name}
+</update>
+
+<delete id="deleteUser" parameterType="User">
+  delete from blog_user where name = #{name}
+</delete>
+</mapper>
