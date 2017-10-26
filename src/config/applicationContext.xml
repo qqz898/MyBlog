@@ -13,9 +13,9 @@
   <!-- 配置数据源 -->
 	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
 		<property name="driverClassName" value="com.mysql.jdbc.Driver"/>
-		<property name="url" value="jdbc:mysql://sqld.duapp.com:4050/qJpHfMLzyVTCCuPkmxpO?useUnicode=true&amp;characterEncoding=utf-8&amp;autoReconnect=true&amp;failOverReadOnly=false"/>
-		<property name="username" value="cf3eee90f10244e697dd40d78ed195f5"/>
-		<property name="password" value="57479f3f95364c679106aebf8402ce2e"/>
+		<property name="url" value="jdbc:mysql://sqld.duapp.com:4050/**dbname**?useUnicode=true&amp;characterEncoding=utf-8&amp;autoReconnect=true&amp;failOverReadOnly=false"/>
+		<property name="username" value="***"/>
+		<property name="password" value="***"/>
 		<property name="validationQuery" value="SELECT 1" />
     	<property name="testOnBorrow" value="true"/>
 		<!-- 连接池启动时的初始值，初始创建了几个数据库连接以备使用 -->
