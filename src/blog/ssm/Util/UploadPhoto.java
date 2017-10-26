@@ -15,9 +15,9 @@ import java.util.Map;
 public class UploadPhoto {
 
 	// 运行前先设置好以下三个参数
-	private static final String BUCKET_NAME = "myblogphotos";
-	private static final String OPERATOR_NAME = "qqz898";
-	private static final String OPERATOR_PWD = "QQZ4444DDDD";
+	private static final String BUCKET_NAME = "****";
+	private static final String OPERATOR_NAME = "****";
+	private static final String OPERATOR_PWD = "****";
 
 	/** 绑定的域名 */
 	private static final String URL = "http://" + BUCKET_NAME
